@@ -1,4 +1,4 @@
-
+from bayesian_model import build_model, predict_readiness
 import streamlit as st
 from datetime import date
 
@@ -74,9 +74,29 @@ if st.button("Generate Study Plan"):
     st.write("**Days Remaining:**", days_remaining)
 
     st.subheader("Bayesian Network Evidence")
-    st.write(evidence)
+    display_evidence = {
+    concept: difficulties[f"Concept{i}Difficulty"]
+    for i, concept in enumerate(concepts, start=1)
+    }
+    display_evidence["Stress"] = stress
+    display_evidence["Days Remaining"] = evidence["DaysRemaining"]
+
+    st.write(display_evidence)
+
+    model = build_model()
+
+    #perform bayes inference using student evidence
+    result = predict_readiness(model, evidence)
+
+    high_readiness = result.get_value(ExamReadiness="High")
+    low_readiness = result.get_value(ExamReadiness="Low")
+    st.subheader("Exam Readiness Prediction")
+    st.write(f"High Readiness: {high_readiness:.2%}")
+    st.write(f"Low Readiness: {low_readiness:.2%}")
+    st.progress(float(high_readiness))
+
 
     st.info(
-        "In the next stage, this evidence will be used "
-        "to calculate exam readiness using Bayesian inference."
+    "Exam readiness has been calculated using Bayesian inference. "
+    "Study recommendations will be added in the next stage."
     )
