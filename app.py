@@ -1,3 +1,4 @@
+from utility import recommend_action
 from bayesian_model import build_model, predict_readiness
 import streamlit as st
 from datetime import date
@@ -94,9 +95,27 @@ if st.button("Generate Study Plan"):
     st.write(f"High Readiness: {high_readiness:.2%}")
     st.write(f"Low Readiness: {low_readiness:.2%}")
     st.progress(float(high_readiness))
+    # Calculate Maximum Expected Utility
+    best_action, utilities = recommend_action(
+    float(high_readiness),
+    stress
+    )
+
+    st.subheader("Expected Utility Analysis")
+
+    for action, utility in utilities.items():
+        st.write(f"**{action}:** {utility:.2f}")
+
+    st.subheader("Recommended Study Action")
+    st.success(f"Recommended Action: {best_action}")
+
+    st.write(
+    f"This action has the highest expected utility "
+    f"({utilities[best_action]:.2f}), based on your "
+    f"exam readiness and stress level."
+    )  
 
 
     st.info(
     "Exam readiness has been calculated using Bayesian inference. "
-    "Study recommendations will be added in the next stage."
     )
